@@ -1,0 +1,30 @@
+name: Deploy to Surge
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install html-minifier-terser
+        run: npm install -g html-minifier-terser
+
+      - name: Minify HTML
+        run: |
+          npx html-minifier-terser index.html -o index.html \
+            --collapse-whitespace --remove-comments --minify-css true --minify-js true || true
+
+      - name: Deploy to Surge
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+        run: npx surge --project . --domain qmessage.surge.sh --token "$SURGE_TOKEN"
