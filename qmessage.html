@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QMessage</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* QMessage - Shared Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: #333;
+}
+
+/* Login Page Background */
+body.login-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Dashboard Background */
+body.dashboard-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+/* Container for login */
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+  margin-top: 2rem;
+}
+
+/* Feature Cards */
+.features-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  padding: 0 2rem;
+}
+
+body.dashboard-page .features-section {
+  display: none;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 250px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card i {
+  font-size: 2.5rem;
+  color: #4facfe;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.feature-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.feature-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+/* Header Styles */
+header {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+header.login-header {
+  padding: 2rem 2rem 0;
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header.login-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+header h1 {
+  margin: -0.5rem 0 0;
+  font-size: 2rem;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+header p {
+  margin: 0.5rem 0 1rem;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Menu Icon */
+.menu-icon {
+  font-size: 1.8rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.menu-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+/* Title */
+.title {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.title:hover {
+  transform: scale(1.02);
+}
+
+.title .qmessage {
+  font-size: 2rem;
+  font-weight: 700;
+  display: block;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.title .dashboard {
+  font-size: 1rem;
+  color: #eaf0f8;
+  display: block;
+  margin-top: 0.2rem;
+  opacity: 0.9;
+}
+
+/* Profile Icon */
+.profile-icon {
+  font-size: 1.8rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.profile-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.profile-icon a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 80px; /* Below header */
+  left: -250px; /* Hidden by default */
+  width: 250px;
+  height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+}
+
+#sidebar.active {
+  left: 0;
+}
+
+#sidebar .menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar .menu a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+#sidebar .menu a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+#sidebar .menu a i {
+  margin-right: 0.5rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* Credits bar below header */
+.credits-bar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  text-align: right;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+.credits-bar a {
+  font-size: 1.2rem;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  margin-right: 1rem;
+}
+.credits-bar a:hover {
+  color: #ffd700;
+}
+
+/* Main Content */
+main {
+  padding: 1rem;
+  margin-top: 0;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Cards */
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.card h2 i {
+  margin-right: 0.5rem;
+  color: #4facfe;
+}
+
+/* Form Elements */
+.input-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.input-group i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+input, textarea, button {
+  width: 100%;
+  padding: 0.875rem;
+  margin-top: 0.5rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #4facfe;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  padding: 0.875rem;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  width: auto;
+  display: inline-block;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 154, 158, 0.3);
+}
+
+button[type="submit"], button {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover, button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+}
+
+/* Form Sections */
+.form-section {
+  display: none;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.form-section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Messages */
+.error-message {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.success-message {
+  color: #27ae60;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+/* Toggle Links */
+.toggle-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e1e5e9;
+}
+
+.toggle-link a {
+  color: #4facfe;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.toggle-link a:hover {
+  color: #00f2fe;
+  text-decoration: underline;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+.link {
+  color: #4facfe;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #00f2fe;
+  text-decoration: underline;
+}
+
+/* Social Login */
+.social-login {
+  margin-top: 0;
+  text-align: center;
+  padding-top: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-login p {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.social-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  margin: 0.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.google-btn {
+  background: white;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  padding: 0.75rem 2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.google-btn:hover {
+  background: #f8f9fa;
+  border-color: #c4c7c5;
+}
+
+.microsoft-btn {
+  background: white;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  padding: 0.75rem 2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.microsoft-btn:hover {
+  background: #f8f9fa;
+  border-color: #c4c7c5;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .container {
+    max-width: 90%;
+    margin: 1rem auto;
+  }
+
+  header {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  header.login-header {
+    padding: 1rem;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem;
+  }
+
+  header p {
+    font-size: 0.85rem;
+  }
+
+  .title .qmessage {
+    font-size: 1.2rem;
+  }
+
+  .menu-icon, .profile-icon {
+    position: absolute;
+    top: 0.75rem;
+  }
+
+  .menu-icon {
+    left: 1rem;
+  }
+
+  .profile-icon {
+    right: 1rem;
+  }
+
+  .features-section {
+    padding: 0 1rem;
+    gap: 1rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem 1rem;
+    min-width: 100%;
+  }
+
+  .feature-card i {
+    font-size: 2rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .feature-card p {
+    font-size: 0.85rem;
+  }
+
+  main, .view-section {
+    padding: 0.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.3rem;
+  }
+
+  input, textarea, button {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .social-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    min-width: 150px;
+  }
+
+  .google-btn, .microsoft-btn {
+    min-width: 150px;
+    padding: 0.75rem 1rem;
+  }
+
+  #sidebar {
+    width: 100%;
+    left: -100%;
+  }
+
+  #sidebar.active {
+    left: 0;
+  }
+
+  .credits-bar {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .container {
+    max-width: 95%;
+  }
+
+  header {
+    padding: 1rem;
+  }
+
+  .features-section {
+    padding: 0 2rem;
+    gap: 1.5rem;
+  }
+
+  .feature-card {
+    min-width: 200px;
+  }
+
+  main, .view-section {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .title .qmessage {
+    font-size: 1.5rem;
+  }
+
+  .menu-icon, .profile-icon {
+    font-size: 1.5rem;
+  }
+
+  #sidebar {
+    width: 250px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    max-width: 800px;
+  }
+
+  main {
+    max-width: 1000px;
+  }
+
+  .features-section {
+    max-width: 1000px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .container {
+    max-width: 400px;
+  }
+
+  main {
+    max-width: 1200px;
+  }
+
+  .features-section {
+    max-width: 1200px;
+  }
+
+  .card {
+    padding: 2.5rem;
+  }
+}
+  </style>
+</head>
+<body class="login-page">
+  <!-- Login Section -->
+  <div id="loginSection" class="container">
+    <header class="login-header">
+      <h1><i class="fas fa-sms"></i> QMessage</h1>
+      <p>Send SMS messages quickly and securely</p>
+    </header>
+    <main>
+      <div class="social-login">
+        <button class="social-btn google-btn" onclick="loginWithGoogle()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Sign in with Google</button>
+        <button class="social-btn microsoft-btn" onclick="loginWithMicrosoft()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18"><path d="M0 0h12v12H0z" fill="#f25022"/><path d="M12 0h12v12H12z" fill="#00a4ef"/><path d="M0 12h12v12H0z" fill="#7fba00"/><path d="M12 12h12v12H12z" fill="#ffb900"/></svg> Sign in with Microsoft</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Feature Cards -->
+  <div class="features-section">
+    <div class="feature-card">
+      <i class="fas fa-bolt"></i>
+      <h3>Instant Delivery</h3>
+      <p>"Send SMS to everyone, instantly and reliably"</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-tag"></i>
+      <h3>Custom Sender ID</h3>
+      <p>"Choose a custom Sender ID - recipients see your brand name instead of a phone number"</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-shield-alt"></i>
+      <h3>Speed, Scale & Trust</h3>
+      <p>"Combines speed, scale, and trust in one simple tool"</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-users"></i>
+      <h3>Effortless Communication</h3>
+      <p>"Making communication effortless for announcements, promotions, reminders"</p>
+    </div>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div id="dashboardSection" style="display: none;">
+    <!-- Header -->
+    <header>
+      <span class="menu-icon" onclick="toggleNav(event)"><i class="fas fa-bars"></i></span>
+      <div class="title" onclick="goDashboard()">
+        <span class="qmessage"><i class="fas fa-sms"></i> QMessage</span>
+        <span class="dashboard">Dashboard</span>
+      </div>
+      <span class="profile-icon"><a href="#profile" onclick="showSection(event,'profileSection')"><i class="fas fa-user-circle"></i></a></span>
+    </header>
+
+    <!-- Sender ID / Username -->
+    <div id="welcomeMessage" style="text-align: center; padding: 2rem; font-size: 1.5rem; color: #4facfe; font-weight: 600;"></div>
+
+    <!-- Credits line -->
+    <div class="credits-bar"><a href="#credits" onclick="showSection(event,'creditsSection')"><i class="fas fa-coins"></i> Credits: 120</a></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="menu">
+        <a href="#" onclick="goDashboard()"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+        <a href="#profile" onclick="showSection(event,'profileSection')"><i class="fas fa-user"></i>Profile</a>
+        <a href="#credits" onclick="showSection(event,'creditsSection')"><i class="fas fa-credit-card"></i> Credits</a>
+        <a href="#send" onclick="showSection(event,'sendSection')"><i class="fas fa-paper-plane"></i> Send Message</a>
+        <a href="#sent" onclick="showSection(event,'sentSection')"><i class="fas fa-envelope-open-text"></i>Sent Messages</a>
+        <a href="#history" onclick="showSection(event,'historySection')"><i class="fas fa-history"></i> History</a>
+        <a href="#about" onclick="showSection(event,'aboutSection')"><i class="fas fa-info-circle"></i> About QMessage</a>
+      </div>
+    </nav>
+
+    <!-- Dashboard default view -->
+    <main id="mainContent">
+      <div class="card">
+        <h2><i class="fas fa-paper-plane"></i> Send a Message</h2>
+        <form id="sendForm">
+          <div class="input-group">
+            <label>Enter Recipient Numbers</label>
+            <div id="phoneInputs">
+              <input type="text" placeholder="e.g. +2507..." required/>
+            </div>
+          </div>
+          <button type="button" class="add-btn" onclick="addPhoneInput()"><i class="fas fa-plus"></i> Add Number</button>
+          <p style="margin-top: 1rem;">
+            Or <a href="https://contacts.google.com" target="_blank" class="link"><i class="fab fa-google"></i> select from Google Contacts</a>
+          </p>
+          <div class="input-group">
+            <label>Message</label>
+            <textarea placeholder="Type your message here..." required></textarea>
+          </div>
+          <button type="submit"><i class="fas fa-paper-plane"></i> Send Message</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2><i class="fas fa-clock"></i> Recent Messages</h2>
+        <ul id="recentMessages">
+          <li><strong>25/12/2025 15:30</strong> → To +2557...: "Good morning"</li>
+          <li><strong>24/12/2025 18:00</strong> → To  +25679...: "call me"</li>
+          <li><strong>24/12/2024 15:30</strong> → To +250733...: "Yes we are"</li>
+          <li><strong>20/12/2025 18:00</strong> → To +1800...: "Meeting at 5pm"</li>
+          <li><strong>10/10/2025 15:30</strong> → To +207...: "Hello!"</li>
+        </ul>
+      </div>
+    </main>
+
+    <!-- Profile -->
+    <section id="profileSection" class="view-section profile" style="display: none;">
+      <div class="card">
+        <h2><i class="fas fa-user"></i> Profile</h2>
+        <div class="profilePic">
+          <i class="fas fa-user-circle" style="font-size: 4rem; color: #4facfe;"></i>
+        </div>
+        <p><strong>Name:</strong> Gilbert</p>
+        <p><strong>Email:</strong> gilbert@example.com</p>
+        <p><strong>Username:</strong> GilbertDev</p>
+        <button><i class="fas fa-edit"></i> Change Username</button>
+        <button><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </section>
+
+    <!-- Credits -->
+    <section id="creditsSection" class="view-section credits" style="display: none;">
+      <div class="card">
+        <h2><i class="fas fa-credit-card"></i> My Credits</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div style="font-size: 3rem; color: #28a745; margin-bottom: 0.5rem;"><i class="fas fa-coins"></i></div>
+          <div style="font-size: 2.5rem; font-weight: 700; color: #28a745;">120</div>
+          <div style="color: #666;">Available Credits</div>
+        </div>
+        <button><i class="fas fa-shopping-cart"></i> Buy Credits</button>
+        <button><i class="fas fa-chart-bar"></i> View Usage</button>
+      </div>
+    </section>
+
+    <!-- Send Message -->
+    <section id="sendSection" class="view-section send" style="display: none;">
+      <div class="card">
+        <h2><i class="fas fa-paper-plane"></i> Send Message</h2>
+        <form id="sendViewForm">
+          <div class="input-group">
+            <label>Enter Recipient Numbers</label>
+            <div id="sendPhoneInputs">
+              <input type="text" placeholder="e.g. +2507..." required/>
+            </div>
+          </div>
+          <button type="button" class="add-btn" onclick="addSendPhoneInput()"><i class="fas fa-plus"></i> Add Number</button>
+          <p style="margin-top: 1rem;">
+            Or <a href="https://contacts.google.com" target="_blank" class="link"><i class="fab fa-google"></i> select from Google Contacts</a>
+          </p>
+          <div class="input-group">
+            <label>Message</label>
+            <textarea placeholder="Type your message here..." required></textarea>
+          </div>
+          <button type="submit"><i class="fas fa-paper-plane"></i> Send Message</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Sent Messages -->
+    <section id="sentSection" class="view-section sent" style="display: none;">
+      <div class="card">
+        <h2><i class="fas fa-envelope-open-text"></i> Sent Messages</h2>
+        <ul id="sentMessages">
+          <li><strong>25/12/2025 15:30</strong> → To +2557...: "Good morning"</li>
+          <li><strong>24/12/2025 18:00</strong> → To +25679...: "call me"</li>
+          <li><strong>24/12/2024 15:30</strong> → To +250733...: "Yes we are"</li>
+          <li><strong>20/12/2025 18:00</strong> → To +1800...: "Meeting at 5pm"</li>
+          <li><strong>10/10/2025 15:30</strong> → To +207...: "Hello!"</li>
+          <li><strong>9/12/2025 15:30</strong> → To +2577...: "Good morning"</li>
+          <li><strong>8/12/2025 18:00</strong> → To +2679...: "call me"</li>
+          <li><strong>7/12/2024 15:30</strong> → To +2540733...: "Yes we are"</li>
+          <li><strong>6/12/2025 18:00</strong> → To +14800...: "Meeting at 5pm"</li>
+          <li><strong>5/10/2025 15:30</strong> → To +2407...: "Hello!"</li>
+          <li><strong>4/12/2025 15:30</strong> → To +2557...: "Good morning"</li>
+          <li><strong>3/12/2025 18:00</strong> → To +25679...: "call me"</li>
+          <li><strong>3/12/2024 15:30</strong> → To +250733...: "Yes we are"</li>
+          <li><strong>2/12/2025 18:00</strong> → To +1800...: "Meeting at 5pm"</li>
+          <li><strong>2/10/2025 15:30</strong> → To +207...: "Hello!"</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- History -->
+    <section id="historySection" class="view-section history" style="display: none;">
+      <div class="card">
+        <h2><i class="fas fa-history"></i> Activity History</h2>
+        <ul id="activityHistory">
+          <li><strong>25/12/2025 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +2557...: "Good morning"</li>
+          <li><strong>25/12/2025 15:25</strong> <i class="fas fa-user-edit" style="color: #4facfe;"></i> Changed username to GilbertDev</li>
+          <li><strong>25/12/2025 15:20</strong> <i class="fas fa-shopping-cart" style="color: #28a745;"></i> Purchased 50 credits (+$5.00)</li>
+          <li><strong>25/12/2025 15:15</strong> <i class="fas fa-sign-in-alt" style="color: #9c27b0;"></i> Logged into QMessage dashboard</li>
+          <li><strong>24/12/2025 18:00</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +25679...: "call me"</li>
+          <li><strong>24/12/2025 17:45</strong> <i class="fas fa-eye" style="color: #607d8b;"></i> Viewed credits usage history</li>
+          <li><strong>24/12/2024 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +250733...: "Yes we are"</li>
+          <li><strong>24/12/2025 14:20</strong> <i class="fas fa-plus" style="color: #4facfe;"></i> Added new phone number input field</li>
+          <li><strong>20/12/2025 18:00</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +1800...: "Meeting at 5pm"</li>
+          <li><strong>20/12/2025 17:30</strong> <i class="fas fa-shopping-cart" style="color: #28a745;"></i> Purchased 100 credits (+$10.00)</li>
+          <li><strong>10/10/2025 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +207...: "Hello!"</li>
+          <li><strong>10/10/2025 15:25</strong> <i class="fas fa-user-edit" style="color: #4facfe;"></i> Updated profile information</li>
+          <li><strong>9/12/2025 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +2577...: "Good morning"</li>
+          <li><strong>8/12/2025 18:00</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +2679...: "call me"</li>
+          <li><strong>8/12/2025 17:50</strong> <i class="fas fa-sign-out-alt" style="color: #dc3545;"></i> Logged out of QMessage</li>
+          <li><strong>7/12/2024 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +2540733...: "Yes we are"</li>
+          <li><strong>6/12/2025 18:00</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +14800...: "Meeting at 5pm"</li>
+          <li><strong>5/10/2025 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +2407...: "Hello!"</li>
+          <li><strong>5/10/2025 15:20</strong> <i class="fas fa-eye" style="color: #607d8b;"></i> Viewed sent messages history</li>
+          <li><strong>4/12/2025 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +2557...: "Good morning"</li>
+          <li><strong>3/12/2025 18:00</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +25679...: "call me"</li>
+          <li><strong>3/12/2024 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +250733...: "Yes we are"</li>
+          <li><strong>2/12/2025 18:00</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +1800...: "Meeting at 5pm"</li>
+          <li><strong>2/10/2025 15:30</strong> <i class="fas fa-paper-plane" style="color: #ff9800;"></i> Sent message to +207...: "Hello!"</li>
+          <li><strong>1/12/2025 12:00</strong> <i class="fas fa-sign-in-alt" style="color: #9c27b0;"></i> Logged into QMessage dashboard</li>
+          <li><strong>30/11/2025 16:45</strong> <i class="fas fa-shopping-cart" style="color: #28a745;"></i> Purchased 25 credits (+$2.50)</li>
+          <li><strong>25/11/2025 09:15</strong> <i class="fas fa-user-edit" style="color: #4facfe;"></i> Changed profile picture</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="aboutSection" class="view-section about" style="display: none;">
+      <div class="card">
+        <h2><i class="fas fa-info-circle"></i> About QMessage</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <i class="fas fa-sms" style="font-size: 4rem; color: #4facfe; margin-bottom: 1rem;"></i>
+        </div>
+        <p>
+          QMessage is a powerful messaging platform that enables you to send SMS messages to everyone you want, all at once, quickly and reliably. Whether you're reaching customers, teammates, or friends, QMessage makes communication effortless.
+        </p>
+        <ul style="padding-left: 1.5rem;">
+          <li style="margin-bottom: 0.5rem;"><i class="fas fa-bolt" style="color: #ff9800; margin-right: 0.5rem;"></i><strong>Fast delivery:</strong> Your messages reach recipients instantly.</li>
+          <li style="margin-bottom: 0.5rem;"><i class="fas fa-users" style="color: #9c27b0; margin-right: 0.5rem;"></i><strong>Mass messaging:</strong> Send to multiple contacts at the same time.</li>
+          <li style="margin-bottom: 0.5rem;"><i class="fas fa-tag" style="color: #4facfe; margin-right: 0.5rem;"></i><strong>Custom Sender ID:</strong> Choose the username that appears as the sender (e.g., ANYNAME).</li>
+          <li style="margin-bottom: 0.5rem;"><i class="fas fa-lock" style="color: #28a745; margin-right: 0.5rem;"></i><strong>Simple access:</strong> Log in with your email and start sending right away.</li>
+          <li style="margin-bottom: 0.5rem;"><i class="fas fa-shield-alt" style="color: #607d8b; margin-right: 0.5rem;"></i><strong>Reliable service:</strong> Built to ensure your messages are delivered securely and consistently.</li>
+        </ul>
+        <p>
+          QMessage helps you connect with people in seconds, making it the ideal tool for announcements, promotions, reminders, or any situation where speed and scale matter.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // QMessage - Social Login to Full Dashboard Logic
+
+document.addEventListener('DOMContentLoaded', function() {
+  // No form submissions needed, only social login buttons
+});
+
+// Social login functions
+function loginWithGoogle() {
+  // Simulate login
+  const welcomeMessage = document.getElementById('welcomeMessage');
+  if (welcomeMessage) {
+    welcomeMessage.textContent = 'GilbertDev';
+    welcomeMessage.style.cursor = 'pointer';
+    welcomeMessage.onclick = function(event) { window.showSection(event, 'profileSection'); };
+  }
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('dashboardSection').style.display = 'block';
+  document.body.className = 'dashboard-page';
+  initializeDashboard();
+}
+
+function loginWithMicrosoft() {
+  // Simulate login
+  const welcomeMessage = document.getElementById('welcomeMessage');
+  if (welcomeMessage) {
+    welcomeMessage.textContent = 'GilbertDev';
+  }
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('dashboardSection').style.display = 'block';
+  document.body.className = 'dashboard-page';
+  initializeDashboard();
+}
+
+// Dashboard initialization
+function initializeDashboard() {
+  // Toggle sidebar
+  window.toggleNav = function(event) {
+    event.stopPropagation();
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+      sidebar.classList.toggle('active');
+    }
+  };
+
+  // Close sidebar when clicking outside menu
+  document.addEventListener('click', function(e) {
+    const sidebar = document.getElementById('sidebar');
+    const menu = sidebar ? sidebar.querySelector('.menu') : null;
+    const menuIcon = document.querySelector('.menu-icon');
+    if (sidebar && sidebar.classList.contains('active') && menu && !menu.contains(e.target) && e.target !== menuIcon) {
+      sidebar.classList.remove('active');
+    }
+  });
+
+  // Show dashboard default view
+  window.goDashboard = function() {
+    const mainContent = document.getElementById('mainContent');
+    const creditsBar = document.querySelector('.credits-bar');
+    if (mainContent) mainContent.style.display = 'block';
+    if (creditsBar) creditsBar.style.display = 'block';
+    hideAllSections();
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('active');
+  };
+
+  // Show specific section
+  window.showSection = function(e, sectionId) {
+    e.preventDefault();
+    const mainContent = document.getElementById('mainContent');
+    const creditsBar = document.querySelector('.credits-bar');
+    if (mainContent) mainContent.style.display = 'none';
+    if (creditsBar) creditsBar.style.display = 'none';
+    hideAllSections();
+    const section = document.getElementById(sectionId);
+    if (section) section.style.display = 'block';
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('active');
+  };
+
+  // Hide all sections
+  function hideAllSections() {
+    const ids = ['profileSection','creditsSection','sendSection','sentSection','historySection','aboutSection'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+  }
+
+  // Add new phone input (dashboard main view)
+  window.addPhoneInput = function() {
+    const container = document.getElementById('phoneInputs');
+    if (container) {
+      const newInput = document.createElement('input');
+      newInput.type = 'text';
+      newInput.placeholder = 'e.g. +2507...';
+      newInput.required = true;
+      newInput.style.marginTop = '0.5rem';
+      container.appendChild(newInput);
+    }
+  };
+
+  // Add new phone input (send section)
+  window.addSendPhoneInput = function() {
+    const container = document.getElementById('sendPhoneInputs');
+    if (container) {
+      const newInput = document.createElement('input');
+      newInput.type = 'text';
+      newInput.placeholder = 'e.g. +2507...';
+      newInput.required = true;
+      newInput.style.marginTop = '0.5rem';
+      container.appendChild(newInput);
+    }
+  };
+
+  window.logout = function() {
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    if (confirm('Are you sure you want to logout?')) {
+      dashboardSection.style.display = 'none';
+      loginSection.style.display = 'block';
+      document.body.className = 'login-page';
+    }
+  };
+}
+
+
+
+// Social login functions
+function loginWithGoogle() {
+  // Simulate login
+  const welcomeMessage = document.getElementById('welcomeMessage');
+  if (welcomeMessage) {
+    welcomeMessage.textContent = 'GilbertDev';
+    welcomeMessage.style.cursor = 'pointer';
+    welcomeMessage.onclick = function(event) { window.showSection(event, 'profileSection'); };
+  }
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('dashboardSection').style.display = 'block';
+  document.body.className = 'dashboard-page';
+  initializeDashboard();
+}
+
+function loginWithMicrosoft() {
+  // Simulate login
+  const welcomeMessage = document.getElementById('welcomeMessage');
+  if (welcomeMessage) {
+    welcomeMessage.textContent = 'GilbertDev';
+    welcomeMessage.style.cursor = 'pointer';
+    welcomeMessage.onclick = function(event) { window.showSection(event, 'profileSection'); };
+  }
+  document.getElementById('loginSection').style.display = 'none';
+  document.getElementById('dashboardSection').style.display = 'block';
+  document.body.className = 'dashboard-page';
+  initializeDashboard();
+}
+  </script>
+</body>
+</html>
