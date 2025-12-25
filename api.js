@@ -1,4 +1,4 @@
-// QMessage Frontend Integration with Backend
+// QMessage Frontend Integration with Backend (Send-Only Model)
 // Configure this with your backend URL
 const API_URL = localStorage.getItem('apiUrl') || 'http://localhost:3000';
 
@@ -9,8 +9,8 @@ function connectSocket() {
   if (typeof io !== 'undefined') {
     socket = io(API_URL, { reconnection: true });
     socket.on('connect', () => console.log('Connected to server'));
-    socket.on('receive_message', (data) => {
-      displayMessage(data);
+    socket.on('message_sent', (data) => {
+      displayMessageSent(data);
     });
   }
 }
@@ -59,38 +59,54 @@ async function handleLogin(email, password) {
   }
 }
 
-// Get all users
-async function getUsers() {
+// Send message to multiple recipients
+async function sendMessage(recipients, content) {
+  if (!socket) connectSocket();
+  const senderId = localStorage.getItem('userId');
+  
   try {
-    const res = await fetch(`${API_URL}/api/users`);
+    const res = await fetch(`${API_URL}/api/send-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ senderId, recipients, content })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    socket.emit('send_message', { senderId, recipients, content });
+    return data.message;
+  } catch (err) {
+    console.error('Send message error:', err);
+    throw err;
+  }
+}
+
+// Get sent message history
+async function getMessageHistory() {
+  try {
+    const userId = localStorage.getItem('userId');
+    const res = await fetch(`${API_URL}/api/messages/${userId}`);
     return await res.json();
   } catch (err) {
-    console.error('Error fetching users:', err);
+    console.error('Error fetching history:', err);
     return [];
   }
 }
 
-// Send message
-function sendMessage(recipientId, content) {
-  if (!socket) connectSocket();
-  const senderId = localStorage.getItem('userId');
-  socket.emit('send_message', { senderId, recipientId, content });
-}
-
-// Display received message
-function displayMessage(data) {
-  const messagesDiv = document.getElementById('messages');
-  if (!messagesDiv) return;
+// Display sent message confirmation
+function displayMessageSent(data) {
+  const historyDiv = document.getElementById('sentMessages');
+  if (!historyDiv) return;
 
   const msgEl = document.createElement('div');
-  msgEl.className = 'message ' + (data.sender === localStorage.getItem('userId') ? 'sent' : 'received');
+  msgEl.className = 'sent-message';
   msgEl.innerHTML = `
-    <strong>${data.sender === localStorage.getItem('userId') ? 'You' : 'User'}:</strong>
+    <strong>Message sent to ${data.messageCount} recipient(s)</strong>
     <p>${escapeHtml(data.content)}</p>
     <small>${new Date(data.timestamp).toLocaleTimeString()}</small>
   `;
-  messagesDiv.appendChild(msgEl);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  historyDiv.appendChild(msgEl);
+  historyDiv.scrollTop = historyDiv.scrollHeight;
 }
 
 // Logout
@@ -110,4 +126,4 @@ function escapeHtml(text) {
 }
 
 // Export for use in index.html
-window.QMessage = { handleSignup, handleLogin, handleLogout, getUsers, sendMessage, connectSocket };
+window.QMessage = { handleSignup, handleLogin, handleLogout, sendMessage, getMessageHistory, connectSocket };

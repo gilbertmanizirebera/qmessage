@@ -31,11 +31,13 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// Message Schema
+// Message Schema (send-only model)
 const messageSchema = new mongoose.Schema({
   sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  recipient: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  recipients: [{ type: String }], // Phone numbers or email addresses to send to
   content: { type: String, required: true },
+  messageCount: { type: Number, default: 1 }, // How many recipients
+  status: { type: String, enum: ['pending', 'sent', 'failed'], default: 'pending' },
   timestamp: { type: Date, default: Date.now }
 });
 
@@ -89,21 +91,70 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Socket.io Real-time Messaging
+// Send message (broadcast to recipients)
+app.post('/api/send-message', async (req, res) => {
+  try {
+    const { senderId, recipients, content } = req.body;
+    if (!senderId || !recipients || !content) {
+      return res.status(400).json({ error: 'Missing fields' });
+    }
+
+    const message = new Message({
+      sender: senderId,
+      recipients: recipients,
+      content: content,
+      messageCount: recipients.length,
+      status: 'sent'
+    });
+    await message.save();
+
+    io.emit('message_sent', {
+      sender: senderId,
+      recipients: recipients,
+      content: content,
+      messageCount: recipients.length,
+      timestamp: new Date()
+    });
+
+    res.json({ success: true, message });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Get sent messages (history)
+app.get('/api/messages/:userId', async (req, res) => {
+  try {
+    const messages = await Message.find({ sender: req.params.userId }).sort({ timestamp: -1 });
+    res.json(messages);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Socket.io Real-time Messaging (send-only)
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
   socket.on('send_message', async (data) => {
     try {
-      const { senderId, recipientId, content } = data;
-      const message = new Message({ sender: senderId, recipient: recipientId, content });
+      const { senderId, recipients, content } = data;
+      const message = new Message({
+        sender: senderId,
+        recipients: recipients,
+        content: content,
+        messageCount: recipients.length,
+        status: 'sent'
+      });
       await message.save();
 
-      io.emit('receive_message', {
+      io.emit('message_sent', {
         sender: senderId,
-        recipient: recipientId,
-        content,
-        timestamp: new Date()
+        recipients: recipients,
+        content: content,
+        messageCount: recipients.length,
+        timestamp: new Date(),
+        messageId: message._id
       });
     } catch (err) {
       console.error('Message error:', err);
