@@ -1,0 +1,31 @@
+name: Deploy Backend to Render (optional)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build Docker image
+        run: docker build -t qmessage-backend ./backend
+
+      - name: Deploy to Render (requires secrets)
+        if: secrets.RENDER_API_KEY && secrets.RENDER_SERVICE_ID
+        uses: render-examples/deploy-to-render@v1
+        with:
+          api_key: ${{ secrets.RENDER_API_KEY }}
+          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+
+      - name: Note
+        run: |
+          echo "If you don't have Render secrets, configure the service in the Render dashboard and set RENDER_API_KEY and RENDER_SERVICE_ID in GitHub Secrets."
